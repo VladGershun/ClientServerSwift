@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F52AA840274468FB001A757F /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = F52AA83F274468FB001A757F /* Server.swift */; };
 		F57C395A2744650A003390BC /* ClientServerSwiftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57C39592744650A003390BC /* ClientServerSwiftApp.swift */; };
 		F57C395C2744650A003390BC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F57C395B2744650A003390BC /* ContentView.swift */; };
 		F57C395E2744650B003390BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F57C395D2744650B003390BC /* Assets.xcassets */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F52AA83F274468FB001A757F /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
 		F57C39562744650A003390BC /* ClientServerSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClientServerSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F57C39592744650A003390BC /* ClientServerSwiftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientServerSwiftApp.swift; sourceTree = "<group>"; };
 		F57C395B2744650A003390BC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				F57C39592744650A003390BC /* ClientServerSwiftApp.swift */,
 				F57C395B2744650A003390BC /* ContentView.swift */,
 				F57C398427446530003390BC /* Client.swift */,
+				F52AA83F274468FB001A757F /* Server.swift */,
 				F57C395D2744650B003390BC /* Assets.xcassets */,
 				F57C39622744650B003390BC /* ClientServerSwift.entitlements */,
 				F57C395F2744650B003390BC /* Preview Content */,
@@ -264,6 +267,7 @@
 			files = (
 				F57C395C2744650A003390BC /* ContentView.swift in Sources */,
 				F57C395A2744650A003390BC /* ClientServerSwiftApp.swift in Sources */,
+				F52AA840274468FB001A757F /* Server.swift in Sources */,
 				F57C398527446530003390BC /* Client.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
