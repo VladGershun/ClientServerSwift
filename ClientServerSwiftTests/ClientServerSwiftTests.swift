@@ -21,6 +21,20 @@ class ClientServerSwiftTests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        
+        let clientSocket = ClientSocket(host: "localhost", port: "49999")
+        let sockedfd = try clientSocket.connect()
+        let message = try sockedfd.readLine()
+        // Tue Nov 23 19:47:5
+        let date = Date.now
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE MMM dd kk:mm:ss"
+        formatter.timeZone = .current
+//        formatter.locale =
+        formatter.calendar = .init(identifier: .gregorian)
+        let expected = String(formatter.string(from: date).dropLast()) + "\n"
+        
+        XCTAssertEqual(message, expected)
     }
 
     func testPerformanceExample() throws {
