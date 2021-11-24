@@ -18,7 +18,7 @@ struct ContentView: View {
             
             Button("Connect") {
                 do {
-                    message = try runClient(address: host, port: port)
+                    message = try runClient(host: host, port: port)
                 } catch {
                     message = error.localizedDescription
                 }

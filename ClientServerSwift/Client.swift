@@ -8,80 +8,94 @@
 import Foundation
 import AppKit
 
-func runClient(address: String, port: String) throws -> String {
-    enum Errors: Error, LocalizedError {
-        case getAddressInfo(String)
-        case getSocketStat(String)
-        case getConnectionStat(String)
-        case getReadStat(String)
-        case getReturnStat(String)
-        
-        var failureReason: String? {
-            switch self {
-            case .getAddressInfo(let string):
-                return "getAddressInfo(\(string))"
-            case .getSocketStat(let string):
-                return "getSocketStat(\(string))"
-            case .getConnectionStat(let string):
-                return "getConnectionStat(\(string))"
-            case .getReadStat(let string):
-                return "getReadStat(\(string))"
-            case .getReturnStat(let string):
-                return "getReturnStat(\(string))"
-            }
+fileprivate enum Errors: Error, LocalizedError {
+    case getAddressInfo(String)
+    case getSocketStat(String)
+    case getConnectionStat(String)
+    case getReadStat(String)
+    case getReturnStat(String)
+
+    var failureReason: String? {
+        switch self {
+        case .getAddressInfo(let string):
+            return "getAddressInfo(\(string))"
+        case .getSocketStat(let string):
+            return "getSocketStat(\(string))"
+        case .getConnectionStat(let string):
+            return "getConnectionStat(\(string))"
+        case .getReadStat(let string):
+            return "getReadStat(\(string))"
+        case .getReturnStat(let string):
+            return "getReturnStat(\(string))"
         }
     }
-    let buf = UnsafeMutableRawPointer.allocate(byteCount: 100, alignment: 2)
-    defer { buf.deallocate() }
-    
-    var hints = addrinfo()
-    hints.ai_socktype = SOCK_STREAM
-    hints.ai_family = AF_INET
-    var addressRef: UnsafeMutablePointer<addrinfo>?
-    
-    let err = getaddrinfo(address, port, &hints, &addressRef)
-    guard err == 0 else {
-        throw Errors.getAddressInfo(String(cString: gai_strerror(err)))
-    }
-    guard let address = addressRef?.pointee else {
-        throw Errors.getAddressInfo("No address found")
-    }
-    
-    let socketfd = socket(address.ai_family, address.ai_socktype, 0)
-    guard socketfd >= 0 else {
-        throw Errors.getSocketStat(String(cString: strerror(errno)))
-    }
-    defer { close(socketfd) }
+}
 
-    guard connect(socketfd, address.ai_addr, address.ai_addrlen) >= 0 else {
-        throw Errors.getConnectionStat(String(cString: strerror(errno)))
-    }
-   
-    let numberRead = read(socketfd, buf, 100)
-    guard numberRead > 0 else {
-        throw Errors.getReadStat("No Bytes Read!")
+struct ClientSocket {
+    let host: String
+    let port: String
+    
+    func connect() throws -> ActiveConnection {
+        var hints = addrinfo()
+        hints.ai_socktype = SOCK_STREAM
+        hints.ai_family = AF_INET
+        var addressRef: UnsafeMutablePointer<addrinfo>?
+        defer { freeaddrinfo(addressRef) }
+        
+        let err = getaddrinfo(host, port, &hints, &addressRef)
+        guard err == 0 else {
+            throw Errors.getAddressInfo(String(cString: gai_strerror(err)))
+        }
+        guard let address = addressRef?.pointee else {
+            throw Errors.getAddressInfo("No address found")
+        }
+
+        let socketfd = socket(address.ai_family, address.ai_socktype, 0)
+        guard socketfd >= 0 else {
+            throw Errors.getSocketStat(String(cString: strerror(errno)))
+        }
+
+        guard Darwin.connect(socketfd, address.ai_addr, address.ai_addrlen) >= 0 else {
+            throw Errors.getConnectionStat(String(cString: strerror(errno)))
+        }
+
+        return ActiveConnection(fileDescriptor: socketfd)
     }
     
-    guard let s = String(bytesNoCopy: buf, length: numberRead, encoding: .utf8, freeWhenDone: false) else {
-        throw Errors.getReturnStat("Return Failed!")
+    class ActiveConnection {
+        let fileDescriptor: Int32
+        let buf = UnsafeMutableRawPointer.allocate(byteCount: 100, alignment: 2)
+        
+        init(fileDescriptor: Int32) {
+            self.fileDescriptor = fileDescriptor
+        }
+        
+        deinit {
+            buf.deallocate()
+            close(fileDescriptor)
+        }
+        
+        func readLine() throws -> String {
+            let numberRead = read(fileDescriptor, buf, 100)
+            guard numberRead > 0 else {
+                throw Errors.getReadStat("No Bytes Read!")
+            }
+            
+            guard let s = String(bytesNoCopy: buf, length: numberRead, encoding: .utf8, freeWhenDone: false) else {
+                throw Errors.getReturnStat("Return Failed!")
+            }
+            return s
+        }
     }
-    return s
+                
 }
 
 
+func runClient(host: String, port: String) throws -> String {
+    let clientSocket = ClientSocket(host: host, port: port)
+    let sockedfd = try clientSocket.connect()
+    let message = try sockedfd.readLine()
+    return message
+}
 
-//struct Socket {
-//    init(host: String, port: String) throws {
-//        fatalError()
-//    }
-//
-//    func read(bytes: Int) throws -> String {
-//        fatalError()
-//    }
-//}
-//
-//func foo() throws {
-//    let socket = try Socket(host: "localhost", port: "49999")
-//    try socket.read(bytes: 100)
-//}
 
