@@ -90,7 +90,6 @@ struct ClientSocket {
                 
 }
 
-
 func runClient(host: String, port: String) throws -> String {
     let clientSocket = ClientSocket(host: host, port: port)
     let sockedfd = try clientSocket.connect()

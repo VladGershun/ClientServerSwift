@@ -7,7 +7,23 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct HomeView: View {
+    var body: some View {
+        TabView {
+            ClientView()
+                .tabItem {
+                    Text("Client")
+                }
+            
+            ClientView()
+                .tabItem {
+                    Text("Server")
+                }
+        }
+    }
+}
+
+struct ClientView: View {
     @State private var host: String = "127.0.0.1"
     @State private var port: String = "49999"
     @State private var message: String = ""
@@ -34,7 +50,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        HomeView()
     }
     
     
